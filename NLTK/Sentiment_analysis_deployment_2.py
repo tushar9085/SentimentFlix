@@ -2,10 +2,13 @@ import numpy as np
 import pickle
 import streamlit as st
 import re
+import matplotlib.pyplot as plt
 import string
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
 
 #Lemmatizer and tfidf object
 wordnet_lem = WordNetLemmatizer()
@@ -88,35 +91,62 @@ def cleaning(text):
 
 
 #Prediction using Multinomial naive bayes
-def sentiment_analysis_MNB(input_string):
-    clean_input_string = cleaning(input_string)
-    lemmatized_string = wordnet_lem.lemmatize(clean_input_string)
-    string_array = np.array([lemmatized_string])
+def sentiment_analysis_MNB(df):
 
-    string_vector = MNB_tfidf.transform(string_array)
+    dt = df['review'].apply(cleaning)
+    dt = pd.DataFrame(dt)
+    dt['review'] = df['review']
 
-    predicted = MNB.predict(string_vector)
+    dt['review'] = dt['review'].apply(wordnet_lem.lemmatize)
 
-    if(predicted[0] == 0):
-        return "NEGATIVE"
-    else:
-        return "POSITIVE"
+    text_counts = MNB_tfidf.transform(dt['review'])
+
+    dt['sentiment'] = MNB.predict(text_counts)
+
+    dt.sentiment = ["Negative" if each == 0 else "Positive" for each in dt.sentiment]
+
+
+    return dt
+
     
 
-#Prediction using n grams Multinomial naive bayes
-def sentiment_analysis_MNB2(input_string):
-    clean_input_string = cleaning(input_string)
-    lemmatized_string = wordnet_lem.lemmatize(clean_input_string)
-    string_array = np.array([lemmatized_string])
+def scrapeComments(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    reviews = soup.find_all('div', {'class': 'text show-more__control'})
+    review_texts = []
+    for review in reviews:
+        review_text = review.text.strip()
+        review_texts.append(review_text)
+    
+    df = pd.DataFrame({'review': review_texts})
+    return df
 
-    string_vector = MNB2_CV2grams.transform(string_array)
 
-    predicted = MNB2.predict(string_vector)
+def show_graph(df):
+    column = 'sentiment' # Replace 'Category' with the name of the column you want to use
 
-    if(predicted[0] == 0):
-        return "NEGATIVE"
-    else:
-        return "POSITIVE"
+    freq = df[column].value_counts()
+
+    # Calculate the percentages
+    total = freq.sum()
+    percentages = [(count/total)*100 for count in freq.values]
+
+    # Create a bar graph
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.barh(freq.index, percentages, height=0.6, color='#2196F3', capstyle='round', joinstyle='round')
+
+    # Customize the graph
+    ax.set_title('Review Sentiment Report', fontsize=20, fontweight='bold')
+    ax.set_xlabel('Percentage', fontsize=14)
+    ax.tick_params(axis='both', which='major', labelsize=12)
+    ax.set_facecolor('#f7f7f7')
+    fig.tight_layout()
+
+    # Display the graph
+    plt.show()
+
+
 
 def main():
     
@@ -128,25 +158,37 @@ def main():
     # getting the input data from the user
     
     
-    input_string = st.text_input('Give Your Opinion to test')
+    url = st.text_input('Give The URL of IMDb Movie Reviews')
     
     
     # creating a button for Prediction
     
     if st.button('Multinomial NB', key="MNB"):
-        prediction = sentiment_analysis_MNB(input_string)
-        st.success(prediction)
+        df = scrapeComments(url)
 
+        new_df = sentiment_analysis_MNB(df)
 
-    if st.button('Multinomial NB 2 Gram', key="MNB2"):
-        prediction = sentiment_analysis_MNB2(input_string)
-        st.success(prediction)
-        
-        
-    
-    
-    
-    
+        column = 'sentiment' # Replace 'Category' with the name of the column you want to use
+
+        freq = new_df[column].value_counts()
+
+        # Calculate the percentages
+        total = freq.sum()
+        percentages = [(count/total)*100 for count in freq.values]
+
+        # Create a bar graph
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.barh(freq.index, percentages, height=0.6, color='#2196F3', capstyle='round', joinstyle='round')
+
+        # Customize the graph
+        ax.set_title('Review Sentiment Report', fontsize=20, fontweight='bold')
+        ax.set_xlabel('Percentage', fontsize=14)
+        ax.tick_params(axis='both', which='major', labelsize=12)
+        ax.set_facecolor('#f7f7f7')
+        fig.tight_layout()
+
+        # Display the graph
+        plt.show()     
     
     
 if __name__ == '__main__':
