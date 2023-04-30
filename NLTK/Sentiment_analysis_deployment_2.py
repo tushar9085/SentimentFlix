@@ -144,7 +144,7 @@ def show_graph(df):
     fig.tight_layout()
 
     # Display the graph
-    plt.show()
+    st.pyplot(fig)
 
 
 
@@ -163,32 +163,13 @@ def main():
     
     # creating a button for Prediction
     
-    if st.button('Multinomial NB', key="MNB"):
+    if st.button('ANALYZE REVIEWS', key="MNB"):
         df = scrapeComments(url)
 
         new_df = sentiment_analysis_MNB(df)
 
-        column = 'sentiment' # Replace 'Category' with the name of the column you want to use
-
-        freq = new_df[column].value_counts()
-
-        # Calculate the percentages
-        total = freq.sum()
-        percentages = [(count/total)*100 for count in freq.values]
-
-        # Create a bar graph
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.barh(freq.index, percentages, height=0.6, color='#2196F3', capstyle='round', joinstyle='round')
-
-        # Customize the graph
-        ax.set_title('Review Sentiment Report', fontsize=20, fontweight='bold')
-        ax.set_xlabel('Percentage', fontsize=14)
-        ax.tick_params(axis='both', which='major', labelsize=12)
-        ax.set_facecolor('#f7f7f7')
-        fig.tight_layout()
-
-        # Display the graph
-        plt.show()     
+        show_graph(new_df)
+        
     
     
 if __name__ == '__main__':
