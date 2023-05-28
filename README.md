@@ -10,7 +10,7 @@ SentimentFlix is a unique project that uses machine learning to analyze the sent
 4. The saved models are in the NLTK folder, if get errors, then correct the paths of that files.
 
 
-#Reference
+# Reference
 https://www.kaggle.com/code/ankumagawa/sentimental-analysis-using-naive-bayes-classifier
 
 
