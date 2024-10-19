@@ -8,6 +8,10 @@ SentimentFlix is a unique project that uses machine learning to analyze the sent
 This project provides a Streamlit application for analyzing IMDb movie reviews. Follow the steps below to run the application locally.
 
 
+# IMDb Review Analysis Deployment
+
+This project provides a Streamlit application for analyzing IMDb movie reviews. Follow the steps below to run the application locally.
+
 ## Requirements
 
 Make sure you have the following installed:
@@ -15,6 +19,7 @@ Make sure you have the following installed:
 - Python 3.x
 - Streamlit
 - NLTK
+- Other necessary libraries listed in `requirements.txt`
 
 ## Steps to Run the Application
 
@@ -28,10 +33,5 @@ Make sure you have the following installed:
    Open the terminal and navigate to the directory where the `Deployment IMDb review analysis.py` file is located. Use the following command to run the Streamlit app:
    ```bash
    streamlit run "path/to/Deployment IMDb review analysis.py"
-
-
-
-# Reference
-https://www.kaggle.com/code/ankumagawa/sentimental-analysis-using-naive-bayes-classifier
 
 
