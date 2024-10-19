@@ -15,7 +15,6 @@ Make sure you have the following installed:
 - Python 3.x
 - Streamlit
 - NLTK
-- Other necessary libraries listed in `requirements.txt`
 
 ## Steps to Run the Application
 
